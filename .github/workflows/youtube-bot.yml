@@ -2,9 +2,9 @@ name: YouTube AI Bot Schedule
 
 on:
   schedule:
-    # This tells the bot to wake up every 20 minutes
-    - cron: '*/20 * * * *'
-  workflow_dispatch: # Allows you to run it manually from GitHub for testing
+    # Runs once a day at 00:00 UTC (8:00 AM Philippines Time)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   run-bot:

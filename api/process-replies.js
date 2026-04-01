@@ -28,7 +28,7 @@ async function processReplies() {
       .select('*')
       .eq('status', 'pending')
       .lte('scheduled_time', new Date().toISOString())
-      .limit(10); 
+      .limit(5); 
 
     if (error) throw error;
 
