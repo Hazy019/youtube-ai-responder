@@ -22,7 +22,7 @@ async function processReplies() {
 
   try {
     // 2. Fetch comments that are ready (status: pending AND time has passed)
-    // We limit to 10 per run to ensure the script doesn't time out on the server
+    // We limit to 5 per run to ensure the script doesn't time out on the server
     const { data: pendingComments, error } = await supabase
       .from('comments_queue')
       .select('*')
