@@ -46,8 +46,8 @@ async function fetchChannelWideComments() {
     // Step B: Fetch comments for the entire channel
     const response = await youtube.commentThreads.list({
       part: 'snippet,replies',
-      allThreadsRelatedToChannelId: myChannelId, // This makes it dynamic!
-      maxResults: 30, // Grabs the 30 most recent comments across the whole channel
+      allThreadsRelatedToChannelId: myChannelId, 
+      maxResults: 100, 
       order: 'time'
     });
 
