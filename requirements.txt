@@ -1,0 +1,4 @@
+@google/generative-ai
+@supabase/supabase-js
+dotenv
+googleapis

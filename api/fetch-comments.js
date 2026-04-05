@@ -47,7 +47,7 @@ async function fetchChannelWideComments() {
     const response = await youtube.commentThreads.list({
       part: 'snippet,replies',
       allThreadsRelatedToChannelId: myChannelId, 
-      maxResults: 100, 
+      maxResults: 50, 
       order: 'time'
     });
 
@@ -59,43 +59,38 @@ async function fetchChannelWideComments() {
 
     let addedCount = 0;
 
-    // Step C: Loop through and save them
     for (const item of comments) {
       const topComment = item.snippet.topLevelComment.snippet;
       const commentId = item.id;
       const videoId = item.snippet.videoId;
       
-      // Prevent the bot from replying to your own comments!
-      if (topComment.authorDisplayName === '@Hazy_Insight') continue;
+      if (topComment.authorDisplayName === process.env.YOUTUBE_CHANNEL_HANDLE) continue;
 
-      // Calculate a random delay between 5 and 10 minutes
       const randomMinutes = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
       const scheduledTime = new Date(Date.now() + randomMinutes * 60000);
 
-      // Attempt to save it to Supabase
       const { data, error } = await supabase
         .from('comments_queue')
-        .insert([{
+        .upsert([{
           comment_id: commentId,
           thread_id: commentId,
           author_name: topComment.authorDisplayName,
           original_text: topComment.textOriginal,
           scheduled_time: scheduledTime.toISOString(),
           status: 'pending'
-        }])
+        }], { onConflict: 'comment_id' })
         .select();
 
-      // If it saves successfully (meaning it wasn't already in the database)
       if (!error) {
-        console.log(`✅ Queued new comment from ${topComment.authorDisplayName} (Video: ${videoId})`);
+        console.log(`Queued new comment from ${topComment.authorDisplayName} (Video: ${videoId})`);
         addedCount++;
       }
     }
 
-    console.log(`\n🎉 Finished! Added ${addedCount} new channel-wide comments to the waiting room.`);
+    console.log(`\n Finished! Added ${addedCount} new channel-wide comments to the waiting room.`);
 
   } catch (error) {
-    console.error('❌ Error fetching comments:', error.message);
+    console.error('Error fetching comments:', error.message);
   }
 }
 
