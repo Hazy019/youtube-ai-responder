@@ -57,6 +57,26 @@ async function fetchChannelWideComments() {
       return;
     }
 
+    // --- NEW: Fetch Video Metadata ---
+    const videoIds = [...new Set(comments.map(item => item.snippet.videoId).filter(id => !!id))];
+    const videoMap = {};
+    
+    if (videoIds.length > 0) {
+      console.log(`🎬 Fetching metadata for ${videoIds.length} unique videos...`);
+      const videoResponse = await youtube.videos.list({
+        part: 'snippet',
+        id: videoIds.join(',')
+      });
+      
+      videoResponse.data.items.forEach(video => {
+        videoMap[video.id] = {
+          title: video.snippet.title,
+          description: video.snippet.description ? video.snippet.description.substring(0, 500) : ''
+        };
+      });
+    }
+    // ---------------------------------
+
     let addedCount = 0;
 
     for (const item of comments) {
@@ -65,6 +85,8 @@ async function fetchChannelWideComments() {
       const videoId = item.snippet.videoId;
       
       if (topComment.authorDisplayName === process.env.YOUTUBE_CHANNEL_HANDLE) continue;
+
+      const videoInfo = videoMap[videoId] || { title: 'Unknown Video', description: '' };
 
       const randomMinutes = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
       const scheduledTime = new Date(Date.now() + randomMinutes * 60000);
@@ -77,12 +99,15 @@ async function fetchChannelWideComments() {
           author_name: topComment.authorDisplayName,
           original_text: topComment.textOriginal,
           scheduled_time: scheduledTime.toISOString(),
-          status: 'pending'
+          status: 'pending',
+          video_id: videoId,
+          video_title: videoInfo.title,
+          video_description: videoInfo.description
         }], { onConflict: 'comment_id' })
         .select();
 
       if (!error) {
-        console.log(`Queued new comment from ${topComment.authorDisplayName} (Video: ${videoId})`);
+        console.log(`Queued new comment from ${topComment.authorDisplayName} (Video: ${videoInfo.title})`);
         addedCount++;
       }
     }

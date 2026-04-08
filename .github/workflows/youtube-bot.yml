@@ -2,7 +2,7 @@ name: YouTube AI Bot Schedule
 
 on:
   schedule:
-    - cron: '0 16,20,0,4 * * *' # 8 AM, 12 PM, 4 PM, 8 PM PST (UTC-8)
+    - cron: '0 0,4,8,12,16,20 * * *' # 12am, 4am, 8am, 12pm, 4pm, 8pm local time (PHT/UTC+8)
   workflow_dispatch:
 
 concurrency:

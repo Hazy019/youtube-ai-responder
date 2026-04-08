@@ -10,9 +10,11 @@
  * Build the full prompt for a given comment.
  * @param {string} authorName - The viewer's display name
  * @param {string} commentText - The viewer's original comment text
+ * @param {string} videoTitle - The title of the video being commented on
+ * @param {string} videoDescription - The description (or snippet) of the video
  * @returns {string} The complete prompt to send to Gemini
  */
-function buildReplyPrompt(authorName, commentText) {
+function buildReplyPrompt(authorName, commentText, videoTitle, videoDescription) {
 
   // ─────────────────────────────────────────────────────────────────
   // 🔧 SECTION 1 — CHANNEL IDENTITY
@@ -65,12 +67,22 @@ function buildReplyPrompt(authorName, commentText) {
     Reply: "I prefer to keep things focused on the videos here! Thanks for watching."
   `.trim();
 
+  const videoContext = `
+    VIDEO TITLE: ${videoTitle || 'Unknown'}
+    VIDEO DESCRIPTION CONTEXT: ${videoDescription || 'No description available'}
+  `.trim();
+
   // ─────────────────────────────────────────────────────────────────
   // PROMPT ASSEMBLY — Do not edit below unless you know what you're doing
   // ─────────────────────────────────────────────────────────────────
   return `
 You are the community manager for a YouTube channel. Your job is to reply to viewer comments in a warm, 
 human, and on-brand way. ${CHANNEL_DESCRIPTION}
+
+════════════════════════════════════════
+VIDEO CONTEXT (Use this to customize your reply)
+════════════════════════════════════════
+${videoContext}
 
 ════════════════════════════════════════
 ABSOLUTE RULES (never break these)

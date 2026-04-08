@@ -56,7 +56,12 @@ async function processReplies() {
         // STEP B: Generate AI Response
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const prompt = buildReplyPrompt(comment.author_name, comment.original_text);
+        const prompt = buildReplyPrompt(
+          comment.author_name, 
+          comment.original_text,
+          comment.video_title,
+          comment.video_description
+        );
 
         const result = await model.generateContent(prompt);
         const aiReplyText = result.response.text().trim();
