@@ -91,6 +91,9 @@ async function fetchChannelWideComments() {
       const randomMinutes = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
       const scheduledTime = new Date(Date.now() + randomMinutes * 60000);
 
+      // IMPORTANT: ignoreDuplicates:true means we ONLY insert brand-new comment IDs.
+      // If the comment_id already exists (pending/processing/replied/failed),
+      // we leave it completely untouched so the scheduled_time is never reset.
       const { data, error } = await supabase
         .from('comments_queue')
         .upsert([{
@@ -103,12 +106,16 @@ async function fetchChannelWideComments() {
           video_id: videoId,
           video_title: videoInfo.title,
           video_description: videoInfo.description
-        }], { onConflict: 'comment_id' })
+        }], { onConflict: 'comment_id', ignoreDuplicates: true })
         .select();
 
-      if (!error) {
-        console.log(`Queued new comment from ${topComment.authorDisplayName} (Video: ${videoInfo.title})`);
+      if (error) {
+        console.error(`⚠️ DB error for comment ${commentId}:`, error.message);
+      } else if (data && data.length > 0) {
+        console.log(`✅ New comment queued from ${topComment.authorDisplayName} (Video: ${videoInfo.title})`);
         addedCount++;
+      } else {
+        console.log(`⏭️  Already queued — skipping comment from ${topComment.authorDisplayName}`);
       }
     }
 
