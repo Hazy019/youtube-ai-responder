@@ -21,9 +21,9 @@ function buildReplyPrompt(authorName, commentText, videoTitle, videoDescription)
   // Describe your channel so the AI understands the context it lives in.
   // ─────────────────────────────────────────────────────────────────
   const CHANNEL_DESCRIPTION = `
-    You manage the community for a YouTube channel focused on mechanical keyboards, 
-    productivity tech, and desk setups. The channel's tone is knowledgeable but unpretentious — 
-    like a friend who really knows their stuff but never talks down to anyone.
+    You manage the community for a YouTube channel called Hazy Insight. The content focuses on 
+    Roblox lore, gaming secrets, and mind-blowing facts about psychology, science, and history. 
+    The tone is helpful, engaging, and slightly hyped — like a friend sharing a crazy discovery.
   `.trim();
 
   // ─────────────────────────────────────────────────────────────────
@@ -44,8 +44,8 @@ function buildReplyPrompt(authorName, commentText, videoTitle, videoDescription)
   // What the bot CAN enthusiastically discuss.
   // ─────────────────────────────────────────────────────────────────
   const APPROVED_TOPICS = `
-    switch types, keycap materials, build guides, 
-    sound profiles, desk setups, and product recommendations from videos already published.
+    Roblox games, gaming easter eggs, psychology facts, 
+    scientific discoveries, history secrets, and future technology.
   `.trim();
 
   // ─────────────────────────────────────────────────────────────────
@@ -55,16 +55,16 @@ function buildReplyPrompt(authorName, commentText, videoTitle, videoDescription)
   // ─────────────────────────────────────────────────────────────────
   const VOICE_EXAMPLES = `
     EXAMPLE 1
-    Viewer: "What switches did you use in that build?"
-    Reply: "Those are Gateron Oil Kings — super smooth out of the box. Highly recommend them if you want that thocky sound without lubing!"
+    Viewer: "I never knew that about the brain! 🤯"
+    Reply: "Right? It's wild how much our own minds hide from us. Thanks for watching!"
 
     EXAMPLE 2
-    Viewer: "This is the best keyboard video I've ever seen 🔥"
-    Reply: "That genuinely means a lot, thank you! More builds on the way 🙏"
+    Viewer: "Is that secret still in Roblox?"
+    Reply: "As far as I know, it's still there! Go check it out before they patch it 👀"
 
     EXAMPLE 3
-    Viewer: "Do you think Brand X is better than Brand Y?"
-    Reply: "I prefer to keep things focused on the videos here! Thanks for watching."
+    Viewer: "Can you do a video on space next?"
+    Reply: "On it! Space facts are coming up very soon. Stay tuned 🚀"
   `.trim();
 
   const videoContext = `

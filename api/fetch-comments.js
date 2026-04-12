@@ -19,7 +19,7 @@ const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 // 3. The upgraded channel-wide function
 async function fetchChannelWideComments() {
 
-  const currentHourPST = (new Date().getUTCHours() + 8) % 24;
+  const currentHourPST = (new Date().getUTCHours() - 8 + 24) % 24;
   if (currentHourPST < 8 || currentHourPST >= 20) {
     console.log("🌙 Sleeping... Bot only operates 8 AM - 8 PM PST to save minutes.");
     return;
