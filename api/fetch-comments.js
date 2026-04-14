@@ -19,12 +19,6 @@ const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 // 3. The upgraded channel-wide function
 async function fetchChannelWideComments() {
 
-  const currentHourPST = (new Date().getUTCHours() - 8 + 24) % 24;
-  if (currentHourPST < 8 || currentHourPST >= 20) {
-    console.log("🌙 Sleeping... Bot only operates 8 AM - 8 PM PST to save minutes.");
-    return;
-  }
-
   console.log('🔍 Looking up your Channel ID...');
 
   try {
@@ -84,12 +78,11 @@ async function fetchChannelWideComments() {
       const commentId = item.id;
       const videoId = item.snippet.videoId;
       
-      if (topComment.authorDisplayName === process.env.YOUTUBE_CHANNEL_HANDLE) continue;
+      if (topComment.authorDisplayName.toLowerCase() === process.env.YOUTUBE_CHANNEL_HANDLE.toLowerCase()) continue;
 
       const videoInfo = videoMap[videoId] || { title: 'Unknown Video', description: '' };
 
-      const randomMinutes = Math.floor(Math.random() * (10 - 5 + 1)) + 5;
-      const scheduledTime = new Date(Date.now() + randomMinutes * 60000);
+      const scheduledTime = new Date(); // Process immediately in the same run
 
       // IMPORTANT: ignoreDuplicates:true means we ONLY insert brand-new comment IDs.
       // If the comment_id already exists (pending/processing/replied/failed),
