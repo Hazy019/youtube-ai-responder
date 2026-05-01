@@ -53,21 +53,37 @@ async function processReplies() {
           .eq('id', comment.id)
           .select();
 
-        // STEP B: Generate AI Response
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        // STEP B: Generate AI Response (Model Cascade)
+        const modelsToTry = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"];
+        let aiReplyText = "";
+        let successfulModel = "";
 
-        const prompt = buildReplyPrompt(
-          comment.author_name, 
-          comment.original_text,
-          comment.video_title,
-          comment.video_description
-        );
+        for (const modelName of modelsToTry) {
+          try {
+            console.log(`🤖 Attempting generation with ${modelName}...`);
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const prompt = buildReplyPrompt(
+              comment.author_name, 
+              comment.original_text,
+              comment.video_title,
+              comment.video_description
+            );
 
-        const result = await model.generateContent(prompt);
-        const aiReplyText = result.response.text().trim();
+            const result = await model.generateContent(prompt);
+            aiReplyText = result.response.text().trim();
+            
+            if (aiReplyText) {
+              successfulModel = modelName;
+              break; 
+            }
+          } catch (modelError) {
+            console.error(`⚠️ ${modelName} failed:`, modelError.message);
+            // Continue to next model
+          }
+        }
 
-        if (!aiReplyText) throw new Error("AI returned an empty response.");
-        console.log(`🧠 AI Response: "${aiReplyText}"`);
+        if (!aiReplyText) throw new Error("All models failed to return a response.");
+        console.log(`🧠 AI Response (${successfulModel}): "${aiReplyText}"`);
 
         // STEP C: Post to YouTube
         await youtube.comments.insert({

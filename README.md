@@ -21,7 +21,7 @@ Designed for high-reliability community engagement with built-in protections aga
 
 - **Runtime:** Node.js 20
 - **Database:** Supabase (PostgreSQL + REST SDK)
-- **AI Engine:** Google Gemini API (`gemini-2.0-flash`)
+- **AI Engine:** Google Gemini AI (Model Cascade: `1.5-flash`, `2.0-flash`, `1.5-pro`)
 - **API Wrapper:** `googleapis` (OAuth2 Refresh Token flow)
 - **CI/CD:** GitHub Actions (Scheduled Cron)
 

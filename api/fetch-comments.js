@@ -78,7 +78,8 @@ async function fetchChannelWideComments() {
       const commentId = item.id;
       const videoId = item.snippet.videoId;
       
-      if (topComment.authorDisplayName.toLowerCase() === process.env.YOUTUBE_CHANNEL_HANDLE.toLowerCase()) continue;
+      // Skip if the comment is from the channel owner (you)
+      if (topComment.authorChannelId?.value === myChannelId) continue;
 
       const videoInfo = videoMap[videoId] || { title: 'Unknown Video', description: '' };
 
