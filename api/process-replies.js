@@ -54,7 +54,13 @@ async function processReplies() {
           .select();
 
         // STEP B: Generate AI Response (Model Cascade)
-        const modelsToTry = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"];
+        // Updated for 2026 environment: Using Gemini 2.5 and 3 models
+        const modelsToTry = [
+          "gemini-2.5-flash", 
+          "gemini-3-flash-preview", 
+          "gemini-2.0-flash",
+          "gemini-flash-latest"
+        ];
         let aiReplyText = "";
         let successfulModel = "";
 
@@ -77,8 +83,12 @@ async function processReplies() {
               break; 
             }
           } catch (modelError) {
-            console.error(`⚠️ ${modelName} failed:`, modelError.message);
-            // Continue to next model
+            if (modelError.message.includes('429')) {
+              console.error(`⚠️ ${modelName} is busy (Rate Limit/Quota). Skipping to next model...`);
+            } else {
+              console.error(`⚠️ ${modelName} failed:`, modelError.message);
+            }
+            // Continue to next model in the cascade
           }
         }
 
@@ -86,7 +96,7 @@ async function processReplies() {
         console.log(`🧠 AI Response (${successfulModel}): "${aiReplyText}"`);
 
         // STEP C: Post to YouTube
-        await youtube.comments.insert({
+        const ytResponse = await youtube.comments.insert({
           part: 'snippet',
           requestBody: {
             snippet: {
@@ -96,14 +106,20 @@ async function processReplies() {
           }
         });
 
+        const newCommentId = ytResponse.data.id;
+
         // STEP D: Mark as completed
         await supabase
           .from('comments_queue')
-          .update({ status: 'replied' })
+          .update({ 
+            status: 'replied',
+            reply_text: aiReplyText // Log the text we actually sent
+          })
           .eq('id', comment.id)
           .select();
 
-        console.log('✅ Reply successfully posted to YouTube!');
+        console.log(`✅ Reply successfully posted! (ID: ${newCommentId})`);
+        console.log(`🔗 Verification Link: https://www.youtube.com/comment?lc=${newCommentId}`);
 
       } catch (innerError) {
         console.error(`⚠️ Error with comment ${comment.id}:`, innerError.message);
